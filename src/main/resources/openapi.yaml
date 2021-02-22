@@ -13,12 +13,12 @@ servers:
   - url: 'http://localhost:8080'
 tags:
   - name: address
-    description: Operations about address
+    description: Operations about addresses
     externalDocs:
       description: Find out more about our store
       url: http://swagger.io
   - name: user
-    description: Operations about user
+    description: Operations about users
     externalDocs:
       description: Find out more about our store
       url: http://swagger.io
@@ -32,131 +32,327 @@ paths:
       operationId: getAllAddresses
       responses:
         '200':
-          description: OK
+          description: 'Details about Addresses'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-  /user:
-    post:
-      tags:
-        - user
-      summary: Create user
-      description: Create user functionality
-      operationId: createUser
-      requestBody:
-        description: Created user object
-        content:
-          '*/*':
-            schema:
-              $ref: '#/components/schemas/User'
-        required: true
-      responses:
+                $ref: '#/components/schemas/Addresses'
+
         default:
-          description: successful operation
-          content: {}
-      x-codegen-request-body-name: body
-  /user/{username}:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /address/{id}:
+    get:
+      tags:
+        - address
+      summary: getAddress
+      operationId: getAddress
+      parameters:
+        - name: id
+          in: path
+          description: The identifier of the address
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Details about Address'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Address'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /address/{id}/users:
+    get:
+      tags:
+        - address
+      summary: getUsersByAddress
+      operationId: getUsersByAddress
+      parameters:
+        - name: id
+          in: path
+          description: The identifier of the address
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Details about Users'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /address/city/{name}:
+    get:
+      tags:
+        - address
+      summary: getUsersByCity
+      operationId: getUsersByCity
+      parameters:
+        - name: name
+          in: path
+          description: The name of the city
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Details about Users'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user:
     get:
       tags:
         - user
-      summary: Get user by user name
-      operationId: getUserByName
-      parameters:
-        - name: username
-          in: path
-          description: 'The name that needs to be fetched. Use user1 for testing. '
-          required: true
-          schema:
-            type: string
+      summary: getAllUsers
+      operationId: getAllUsers
       responses:
-        200:
-          description: successful operation
+        '200':
+          description: 'Details about Users'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - user
+      summary: createUser
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  properties:
+                    address:
+                      type: object
+                      properties:
+                        city:
+                          type: string
+                        other:
+                          type: string
+                        region:
+                          type: string
+                        street:
+                          type: string
+                    name:
+                      type: string
+                  example:
+                    address:
+                      city: Minsk
+                      other: house 3
+                      region: north
+                      street: Indep str
+                    name: Jake
+
+                - type: object
+                  properties:
+                    address:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                    name:
+                      type: string
+                  example:
+                    address:
+                    id: 1
+                    name: Jake
+      responses:
+        '201':
+          description: 'Create a new User'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-        404:
-          description: User not found
-          content: {}
-    put:
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user/{id}:
+    get:
       tags:
         - user
-      summary: Updated user
-      description: This can only be done by the logged in user.
-      operationId: updateUser
+      summary: getUserById
+      operationId: getUserById
       parameters:
-        - name: username
+        - name: id
           in: path
-          description: name that need to be updated
+          description: The identifier of the User
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Details about Users'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user/{id}/balance:
+    get:
+      tags:
+        - user
+      summary: getUserByBalance
+      operationId: getUserByBalance
+      parameters:
+        - name: id
+          in: path
+          description: The identifier of the User
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Details about Users'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags:
+        - user
+      summary: changeUserBalance
+      operationId: changeUserBalance
+      parameters:
+        - name: id
+          in: path
+          description: The identifier of the User
           required: true
           schema:
             type: string
       requestBody:
-        description: Updated user object
         content:
-          '*/*':
+          application/json:
             schema:
-              $ref: '#/components/schemas/User'
-        required: true
+              type: object
+              properties:
+                value:
+                  type: number
+                  format: double
+              example:
+                value: 123.34
       responses:
-        200:
-          description: successful operation
+        '200':
+          description: 'Details about Users'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        400:
-          description: Invalid user supplied
-          content: {}
-        404:
-          description: User not found
-          content: {}
-      x-codegen-request-body-name: body
-    delete:
-      tags:
-        - user
-      summary: Delete user
-      description: This can only be done by the logged in user.
-      operationId: deleteUser
-      parameters:
-        - name: username
-          in: path
-          description: The name that needs to be deleted
-          required: true
-          schema:
-            type: string
-      responses:
-        201:
-          description: operation successful
-          content: {}
-        400:
-          description: Invalid username supplied
-          content: {}
-        404:
-          description: User not found
-          content: {}
+                $ref: '#/components/schemas/Users'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   schemas:
-    User:
+    Addresses:
+      description: An array of Address
+      type: array
+      items:
+        $ref: '#/components/schemas/Address'
+      minItems: 0
+
+    Address:
       type: object
+      required:
+        - id
       properties:
         id:
           type: integer
           format: int64
-        username:
+        other:
           type: string
-        firstName:
+        street:
           type: string
-        lastName:
+        city:
           type: string
-        email:
+        region:
           type: string
-        password:
-          type: string
-        phone:
-          type: string
-        userStatus:
+
+    Users:
+      description: An array of Users
+      type: array
+      items:
+        $ref: '#/components/schemas/User'
+      minItems: 0
+
+    User:
+      type: object
+      required:
+        - id
+      properties:
+        id:
           type: integer
-          description: User Status
+          format: int64
+        name:
+          type: string
+        address:
+          $ref: '#/components/schemas/Address'
+        balance:
+          type: number
+          format: double
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
           format: int32
+        message:
+          type: string
